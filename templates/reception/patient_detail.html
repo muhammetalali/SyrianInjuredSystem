@@ -10,8 +10,24 @@
     <strong>الرقم العسكري:</strong> {{ patient.military_number }}<br>
     <strong>الرتبة:</strong> {{ patient.rank }}<br>
     <strong>الوحدة العسكرية:</strong> {{ patient.military_unit }}<br>
+    <strong>الوضع الاجتماعي:</strong> {{ patient.get_social_status_display }}<br>
+    {% if patient.social_status == 'married' %}
+        <strong>عدد الأطفال:</strong> {{ patient.children_count }}<br>
+    {% endif %}
     <strong>الحالة:</strong> {{ patient.get_status_display }}<br>
     <strong>الحالة الصحية:</strong> {{ patient.health_condition }}<br>
+</div>
+
+<h2>الوثائق والصور</h2>
+<div class="report-box">
+    <strong>البطاقة الشخصية:</strong> {{ patient.has_identity_card|yesno:"موجودة,غير موجودة" }}
+    {% if patient.identity_card_image %} | <a href="{{ patient.identity_card_image.url }}" target="_blank">عرض الصورة</a>{% endif %}<br>
+    <strong>البطاقة العسكرية:</strong> {{ patient.has_military_card|yesno:"موجودة,غير موجودة" }}
+    {% if patient.military_card_image %} | <a href="{{ patient.military_card_image.url }}" target="_blank">عرض الصورة</a>{% endif %}<br>
+    <strong>التقرير الطبي:</strong> {{ patient.has_medical_report|yesno:"موجود,غير موجود" }}
+    {% if patient.medical_report_image %} | <a href="{{ patient.medical_report_image.url }}" target="_blank">عرض الصورة</a>{% endif %}<br>
+    <strong>وثيقة الإصابة:</strong> {{ patient.has_injury_document|yesno:"موجودة,غير موجودة" }}
+    {% if patient.injury_document_image %} | <a href="{{ patient.injury_document_image.url }}" target="_blank">عرض الصورة</a>{% endif %}
 </div>
 
 {% if patient.medical_evaluation %}
@@ -22,11 +38,22 @@
 </div>
 
 <div class="report-box">
-    <strong>الطبيب المسؤول:</strong> {{ patient.medical_evaluation.main_doctor_name }}<br>
-    <strong>الأطباء الحاضرون:</strong> {{ patient.medical_evaluation.committee_members }}<br>
+    <strong>الطبيب المسؤول:</strong>
+    {% if patient.medical_evaluation.doctor %}
+        {{ patient.medical_evaluation.doctor.get_full_name|default:patient.medical_evaluation.doctor.username }}
+    {% else %}
+        غير محدد
+    {% endif %}<br>
+    <strong>الأطباء الحاضرون:</strong>
+    {% for doctor in patient.medical_evaluation.committee_doctors.all %}
+        {{ doctor }}{% if not forloop.last %}، {% endif %}
+    {% empty %}
+        {{ patient.medical_evaluation.committee_members|default:"غير محدد" }}
+    {% endfor %}<br>
     <strong>التشخيص:</strong> {{ patient.medical_evaluation.diagnosis }}<br>
-    <strong>درجة الإصابة:</strong> {{ patient.medical_evaluation.injury_degree }}<br>
+    <strong>درجة الإصابة:</strong> {{ patient.medical_evaluation.get_injury_degree_display }}<br>
     <strong>قرار اللجنة:</strong> {{ patient.medical_evaluation.get_decision_display }}<br>
+    <strong>سبب القرار:</strong> {{ patient.medical_evaluation.decision_reason|default:"غير محدد" }}<br>
 </div>
 {% endif %}
 

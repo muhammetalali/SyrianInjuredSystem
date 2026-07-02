@@ -3,319 +3,305 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>نظام إدارة شؤون الجرحى</title>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام إدارة شؤون الجرحى | وزارة الدفاع</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary-dark: #062f28; /* لون الشعار الداكن */
+            --primary-gold: #a89568; /* لون الشعار الذهبي */
+            --bg-light: #f4f7f6;
+            --text-dark: #1a1a1a;
+            --white: #ffffff;
+        }
+
         body {
-            font-family: Tahoma, Arial, sans-serif;
+            font-family: 'Cairo', sans-serif;
             margin: 0;
-            background: #f4f6f9;
-            color: #222;
+            background: var(--bg-light);
+            color: var(--text-dark);
+            line-height: 1.6;
         }
 
         .top-bar {
-            background: #062f28;
-            color: white;
-            padding: 18px 40px;
+            background: var(--primary-dark);
+            color: var(--white);
+            padding: 15px 40px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            border-bottom: 4px solid #a89568;
+            border-bottom: 4px solid var(--primary-gold);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
-        .logo-area {
-            display: flex;
-            align-items: center;
-            gap: 18px;
-        }
-
-        .logo-box {
-            width: 95px;
-            height: 95px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            background: transparent;
-        }
-
-        .logo-box img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-
-        .top-bar h1 {
-            margin: 0;
-            font-size: 25px;
-            color: #ffffff;
-        }
-
-        .top-bar p {
-            margin: 6px 0 0;
-            font-size: 15px;
-            color: #d8c99b;
-        }
+        .logo-area { display: flex; align-items: center; gap: 20px; }
+        .logo-box { width: 85px; height: 85px; background: transparent; }
+        .logo-box img { width: 100%; height: 100%; object-fit: contain; }
+        .top-bar h1 { margin: 0; font-size: 24px; font-weight: 700; }
+        .top-bar p { margin: 5px 0 0; font-size: 14px; color: var(--primary-gold); }
 
         .nav {
-            background: #0b3d35;
-            padding: 12px 40px;
-            border-bottom: 1px solid #1f5a4f;
+            background: #041f1a;
+            padding: 10px 40px;
+            display: flex;
+            gap: 25px;
         }
-
         .nav a {
-            color: white;
+            color: var(--white);
             text-decoration: none;
-            margin-left: 20px;
-            font-weight: bold;
+            font-weight: 600;
             font-size: 14px;
+            transition: color 0.3s;
         }
-
-        .nav a:hover {
-            color: #d8c99b;
+        .nav a:hover { color: var(--primary-gold); }
+        .nav-right { display: flex; gap: 20px; }
+        .nav-left { margin-right: auto; }
+        .nav-left span { color: var(--primary-gold); margin-left: 10px; font-size: 13px;}
+        .logout-form { display: inline; margin-right: 15px; }
+        .logout-button {
+            background: transparent;
+            border: none;
+            color: var(--white);
+            cursor: pointer;
+            font-family: 'Cairo', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            padding: 0;
         }
+        .logout-button:hover { color: var(--primary-gold); }
 
         .container {
-            width: 92%;
-            margin: 25px auto;
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 0 12px rgba(0,0,0,0.08);
+            width: 90%;
+            max-width: 1200px;
+            margin: 30px auto;
+            background: var(--white);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
 
         h2 {
-            color: #062f28;
-            border-bottom: 2px solid #a89568;
-            padding-bottom: 10px;
+            color: var(--primary-dark);
+            border-bottom: 2px solid var(--primary-gold);
+            padding-bottom: 12px;
             margin-top: 0;
+            font-weight: 700;
         }
 
-        .form-grid {
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .form-group { margin-bottom: 15px; }
+        .document-pair {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 18px;
+            grid-template-columns: minmax(140px, 0.7fr) minmax(180px, 1.3fr);
+            gap: 14px;
+            align-items: end;
         }
-
-        .form-group {
-            margin-bottom: 15px;
+        .document-upload.is-hidden,
+        .conditional-field.is-hidden {
+            display: none;
         }
-
-        label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 7px;
-            color: #222;
+        .file-status {
+            display: inline-block;
+            margin-top: 6px;
+            font-weight: 700;
+            font-size: 13px;
         }
-
+        .file-status.accepted { color: #1e8449; }
+        .file-status.rejected { color: #a93226; }
+        .checkbox-list {
+            display: grid;
+            gap: 8px;
+            padding: 10px 12px;
+            border: 1px solid #ccd1d1;
+            border-radius: 5px;
+            background: #fff;
+        }
+        .checkbox-list label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0;
+            font-weight: 500;
+        }
+        .doctor-choice-list {
+            display: grid;
+            gap: 10px;
+            padding: 10px 12px;
+            border: 1px solid #ccd1d1;
+            border-radius: 5px;
+            background: #fff;
+        }
+        .doctor-choice {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 0;
+            padding: 10px;
+            border: 1px solid #e5e8e8;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .doctor-choice:hover {
+            background: #f4f7f6;
+        }
+        .doctor-choice input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+        .doctor-select-button {
+            min-width: 72px;
+            text-align: center;
+            background: #eef3f1;
+            color: var(--primary-dark);
+            border: 1px solid #ccd1d1;
+            border-radius: 5px;
+            padding: 6px 10px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+        .doctor-choice input:checked + .doctor-select-button {
+            background: var(--primary-dark);
+            border-color: var(--primary-dark);
+            color: var(--white);
+        }
+        .doctor-choice-name {
+            flex: 1;
+            font-weight: 600;
+        }
+        .field-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+        .btn-small {
+            padding: 7px 14px;
+            font-size: 13px;
+        }
+        @media (max-width: 650px) {
+            .document-pair { grid-template-columns: 1fr; }
+        }
+        label { display: block; font-weight: 600; margin-bottom: 8px; font-size: 14px; }
+        
         .form-control {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #bbb;
-            border-radius: 8px;
+            padding: 10px 12px;
+            border: 1px solid #ccd1d1;
+            border-radius: 5px;
             box-sizing: border-box;
-            font-family: Tahoma, Arial, sans-serif;
+            font-family: 'Cairo', sans-serif;
+            font-size: 14px;
+            transition: border-color 0.3s, box-shadow 0.3s;
         }
-
         .form-control:focus {
             outline: none;
-            border-color: #0b3d35;
-            box-shadow: 0 0 4px rgba(11, 61, 53, 0.3);
-        }
-
-        textarea.form-control {
-            resize: vertical;
-        }
-
-        .form-check-input {
-            transform: scale(1.3);
-            margin-left: 8px;
+            border-color: var(--primary-gold);
+            box-shadow: 0 0 0 3px rgba(168, 149, 104, 0.2);
         }
 
         .btn {
-            background: #062f28;
-            color: white;
-            padding: 11px 25px;
+            background: var(--primary-dark);
+            color: var(--white);
+            padding: 10px 25px;
             border: none;
-            border-radius: 8px;
+            border-radius: 5px;
             text-decoration: none;
             cursor: pointer;
-            font-weight: bold;
+            font-weight: 600;
+            font-family: 'Cairo', sans-serif;
+            transition: background 0.3s;
             display: inline-block;
-            margin-top: 10px;
-            font-family: Tahoma, Arial, sans-serif;
         }
+        .btn:hover { background: #084339; }
+        .btn-danger { background: #a93226; } .btn-danger:hover { background: #922b21; }
+        .btn-warning { background: #d4ac0d; } .btn-warning:hover { background: #b7950b; }
 
-        .btn:hover {
-            background: #0b3d35;
-        }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
+        th, td { border: 1px solid #e5e8e8; padding: 12px; text-align: right; }
+        th { background: var(--primary-dark); color: var(--white); font-weight: 600; }
+        tr:nth-child(even) { background: #fcfcfc; }
+        tr:hover { background: #f2f4f4; }
 
-        .btn-secondary {
-            background: #555;
-        }
-
-        .btn-secondary:hover {
-            background: #444;
-        }
-
-        .btn-danger {
-            background: #9b1c1c;
-        }
-
-        .btn-danger:hover {
-            background: #7f1515;
-        }
-
-        .btn-warning {
-            background: #b8860b;
-        }
-
-        .btn-warning:hover {
-            background: #9a7008;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 18px;
-            background: white;
-        }
-
-        th, td {
-            border: 1px solid #ddd;
-            padding: 11px;
-            text-align: right;
-            vertical-align: top;
-        }
-
-        th {
-            background: #062f28;
-            color: white;
-        }
-
-        tr:nth-child(even) {
-            background: #f8f8f8;
-        }
-
-        .cards {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 15px;
-        }
-
-        .card {
-            padding: 20px;
-            background: #f5f8f7;
-            border: 1px solid #d6e3df;
-            border-radius: 10px;
-            text-align: center;
-        }
-
-        .card strong {
-            display: block;
-            font-size: 28px;
-            color: #062f28;
-            margin-bottom: 8px;
+        .tracking-badge {
+            background: var(--primary-gold);
+            color: var(--white);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 12px;
         }
 
         .message {
-            padding: 12px;
-            background: #dff0d8;
-            border: 1px solid #b6d7a8;
-            color: #255625;
-            margin-bottom: 15px;
-            border-radius: 8px;
+            padding: 15px;
+            background: #d4efdf;
+            border-left: 5px solid #27ae60;
+            color: #1e8449;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            font-weight: 600;
         }
 
         .report-box {
-            background: #f8f8f8;
-            border-right: 5px solid #a89568;
-            padding: 15px;
-            line-height: 1.9;
-            margin-top: 15px;
-            border-radius: 8px;
+            background: #fdfefe;
+            border-right: 4px solid var(--primary-gold);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            font-size: 15px;
         }
 
-        .footer {
-            width: 92%;
-            margin: 20px auto;
-            text-align: center;
-            color: #777;
-            font-size: 13px;
-            padding-bottom: 20px;
-        }
-
-        @media (max-width: 900px) {
-            .form-grid,
-            .cards {
-                grid-template-columns: 1fr;
-            }
-
-            .top-bar {
-                padding: 15px;
-            }
-
-            .logo-box {
-                width: 75px;
-                height: 75px;
-            }
-
-            .top-bar h1 {
-                font-size: 20px;
-            }
-
-            .nav {
-                padding: 10px 15px;
-            }
-
-            .nav a {
-                display: inline-block;
-                margin-bottom: 8px;
-            }
-        }
+        .footer { text-align: center; color: #7f8c8d; font-size: 13px; padding: 20px; margin-top: 20px;}
     </style>
 </head>
-
 <body>
 
 <div class="top-bar">
     <div class="logo-area">
         <div class="logo-box">
-            <img src="{% static 'reception/images/logo.jpg' %}" alt="شعار الجهة">
+            <img src="{% static 'reception/images/logo.jpg' %}" alt="وزارة الدفاع">
         </div>
-
         <div>
-            <h1>مديرية شؤون الجرحى</h1>
-            <p>وزارة الدفاع - نظام استقبال وتقييم ومتابعة بيانات المصابين</p>
+            <h1>وزارة الدفاع | مديرية شؤون الجرحى</h1>
+            <p>النظام المركزي الموحد لاستقبال وتقييم ومتابعة بيانات المصابين</p>
         </div>
     </div>
 </div>
 
 <div class="nav">
-    <a href="{% url 'reception:dashboard' %}">الرئيسية</a>
-    <a href="{% url 'reception:intake_create' %}">استقبال مصاب</a>
-    <a href="{% url 'reception:medical_queue' %}">التقييم الطبي</a>
-    <a href="{% url 'reception:accepted_list' %}">المقبولون</a>
-    <a href="{% url 'reception:suspended_list' %}">المعلّقون</a>
-    <a href="{% url 'reception:rejected_list' %}">المرفوضون</a>
-    <a href="/admin/">لوحة المدير</a>
+    <div class="nav-right">
+        <a href="{% url 'reception:dashboard' %}">الرئيسية</a>
+        <a href="{% url 'reception:intake_create' %}">استقبال مصاب</a>
+        <a href="{% url 'reception:medical_queue' %}">التقييم الطبي</a>
+        <a href="{% url 'reception:accepted_list' %}">المقبولون</a>
+        <a href="{% url 'reception:suspended_list' %}">المعلّقون</a>
+        <a href="{% url 'reception:rejected_list' %}">المرفوضون</a>
+    </div>
+    <div class="nav-left">
+        <span>مرحباً، {{ request.user.get_full_name|default:request.user.username }}</span>
+        {% if request.user.is_superuser %}
+            <a href="/admin/">لوحة التحكم الإدارية</a>
+        {% endif %}
+        <form method="post" action="{% url 'logout' %}" class="logout-form">
+            {% csrf_token %}
+            <button type="submit" class="logout-button">تسجيل الخروج</button>
+        </form>
+    </div>
 </div>
 
 <div class="container">
     {% if messages %}
         {% for message in messages %}
-            <div class="message">
-                {{ message }}
-            </div>
+            <div class="message">{{ message }}</div>
         {% endfor %}
     {% endif %}
-
-    {% block content %}
-    {% endblock %}
+    
+    {% block content %}{% endblock %}
 </div>
 
 <div class="footer">
-    نظام إدارة شؤون الجرحى - وزارة الدفاع
+    جميع الحقوق محفوظة &copy; وزارة الدفاع - نظام إدارة شؤون الجرحى
 </div>
 
 </body>
