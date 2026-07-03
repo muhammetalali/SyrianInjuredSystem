@@ -3,21 +3,165 @@
 {% block content %}
 <h2>المرحلة الأولى: واجهة الاستقبال</h2>
 
-<form method="post">
+<form method="post" enctype="multipart/form-data">
     {% csrf_token %}
 
     <div class="form-grid">
         {% for field in form %}
-            <div class="form-group">
-                <label>{{ field.label }}</label>
-                {{ field }}
-                {% if field.errors %}
-                    <small style="color:red;">{{ field.errors }}</small>
-                {% endif %}
-            </div>
+            {% if field.name == 'identity_card_image' or field.name == 'military_card_image' or field.name == 'medical_report_image' or field.name == 'injury_document_image' %}
+            {% elif field.name == 'has_identity_card' %}
+                <div class="form-group document-pair">
+                    <div>
+                        <label>{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}<small style="color:red;">{{ field.errors }}</small>{% endif %}
+                    </div>
+                    <div class="document-upload is-hidden" data-checkbox-id="{{ field.auto_id }}">
+                        <label>{{ form.identity_card_image.label }}</label>
+                        {{ form.identity_card_image }}
+                        <span class="file-status{% if form.identity_card_image.errors %} rejected{% endif %}" aria-live="polite">{% if form.identity_card_image.errors %}X خطأ{% endif %}</span>
+                        {% if form.identity_card_image.errors %}<small style="color:red;">{{ form.identity_card_image.errors }}</small>{% endif %}
+                    </div>
+                </div>
+            {% elif field.name == 'has_military_card' %}
+                <div class="form-group document-pair">
+                    <div>
+                        <label>{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}<small style="color:red;">{{ field.errors }}</small>{% endif %}
+                    </div>
+                    <div class="document-upload is-hidden" data-checkbox-id="{{ field.auto_id }}">
+                        <label>{{ form.military_card_image.label }}</label>
+                        {{ form.military_card_image }}
+                        <span class="file-status{% if form.military_card_image.errors %} rejected{% endif %}" aria-live="polite">{% if form.military_card_image.errors %}X خطأ{% endif %}</span>
+                        {% if form.military_card_image.errors %}<small style="color:red;">{{ form.military_card_image.errors }}</small>{% endif %}
+                    </div>
+                </div>
+            {% elif field.name == 'has_medical_report' %}
+                <div class="form-group document-pair">
+                    <div>
+                        <label>{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}<small style="color:red;">{{ field.errors }}</small>{% endif %}
+                    </div>
+                    <div class="document-upload is-hidden" data-checkbox-id="{{ field.auto_id }}">
+                        <label>{{ form.medical_report_image.label }}</label>
+                        {{ form.medical_report_image }}
+                        <span class="file-status{% if form.medical_report_image.errors %} rejected{% endif %}" aria-live="polite">{% if form.medical_report_image.errors %}X خطأ{% endif %}</span>
+                        {% if form.medical_report_image.errors %}<small style="color:red;">{{ form.medical_report_image.errors }}</small>{% endif %}
+                    </div>
+                </div>
+            {% elif field.name == 'has_injury_document' %}
+                <div class="form-group document-pair">
+                    <div>
+                        <label>{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.errors %}<small style="color:red;">{{ field.errors }}</small>{% endif %}
+                    </div>
+                    <div class="document-upload is-hidden" data-checkbox-id="{{ field.auto_id }}">
+                        <label>{{ form.injury_document_image.label }}</label>
+                        {{ form.injury_document_image }}
+                        <span class="file-status{% if form.injury_document_image.errors %} rejected{% endif %}" aria-live="polite">{% if form.injury_document_image.errors %}X خطأ{% endif %}</span>
+                        {% if form.injury_document_image.errors %}<small style="color:red;">{{ form.injury_document_image.errors }}</small>{% endif %}
+                    </div>
+                </div>
+            {% elif field.name == 'children_count' %}
+                <div class="form-group conditional-field is-hidden" data-social-status-child-count>
+                    <label>{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <small style="color:red;">{{ field.errors }}</small>
+                    {% endif %}
+                </div>
+            {% else %}
+                <div class="form-group">
+                    <label>{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}
+                        <small style="color:red;">{{ field.errors }}</small>
+                    {% endif %}
+                </div>
+            {% endif %}
         {% endfor %}
     </div>
 
     <button type="submit" class="btn">حفظ وتحويل إلى التقييم الطبي</button>
 </form>
+
+<script>
+    (function () {
+        const allowedImageTypes = ['image/jpeg', 'image/png', 'image/webp'];
+        const allowedExtensions = ['jpg', 'jpeg', 'png', 'webp'];
+
+        function setStatus(statusElement, accepted) {
+            statusElement.textContent = accepted ? '✓ قبول' : 'X خطأ';
+            statusElement.classList.toggle('accepted', accepted);
+            statusElement.classList.toggle('rejected', !accepted);
+        }
+
+        document.querySelectorAll('.document-upload').forEach(function (uploadGroup) {
+            const checkbox = document.getElementById(uploadGroup.dataset.checkboxId);
+            const fileInput = uploadGroup.querySelector('input[type="file"]');
+            const statusElement = uploadGroup.querySelector('.file-status');
+
+            if (!checkbox || !fileInput || !statusElement) {
+                return;
+            }
+
+            function syncUploadVisibility() {
+                uploadGroup.classList.toggle('is-hidden', !checkbox.checked);
+                if (!checkbox.checked) {
+                    fileInput.value = '';
+                    statusElement.textContent = '';
+                    statusElement.className = 'file-status';
+                }
+            }
+
+            checkbox.addEventListener('change', syncUploadVisibility);
+            fileInput.addEventListener('change', function () {
+                const file = fileInput.files[0];
+
+                if (!file) {
+                    statusElement.textContent = '';
+                    statusElement.className = 'file-status';
+                    return;
+                }
+
+                const extension = file.name.split('.').pop().toLowerCase();
+                const isAccepted = allowedImageTypes.includes(file.type) || allowedExtensions.includes(extension);
+                setStatus(statusElement, isAccepted);
+
+                if (!isAccepted) {
+                    fileInput.value = '';
+                }
+            });
+
+            syncUploadVisibility();
+        });
+
+        const socialStatusField = document.getElementById('id_social_status');
+        const childrenFieldGroup = document.querySelector('[data-social-status-child-count]');
+        const childrenInput = document.getElementById('id_children_count');
+
+        function syncChildrenField() {
+            if (!socialStatusField || !childrenFieldGroup) {
+                return;
+            }
+
+            const isMarried = socialStatusField.value === 'married';
+            childrenFieldGroup.classList.toggle('is-hidden', !isMarried);
+            if (childrenInput) {
+                childrenInput.required = isMarried;
+                if (!isMarried) {
+                    childrenInput.value = '0';
+                }
+            }
+        }
+
+        if (socialStatusField) {
+            socialStatusField.addEventListener('change', syncChildrenField);
+            syncChildrenField();
+        }
+    }());
+</script>
 {% endblock %}

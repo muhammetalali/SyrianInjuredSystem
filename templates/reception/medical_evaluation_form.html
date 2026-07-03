@@ -1,38 +1,123 @@
 {% extends 'reception/base.html' %}
-
 {% block content %}
 <h2>المرحلة الثانية: التقييم الطبي</h2>
 
 <div class="report-box">
+    <strong>رقم التتبع التسلسلي: <span class="tracking-badge">{{ patient.tracking_number }}</span></strong><br><br>
     <strong>بيانات المصاب:</strong><br>
-    الاسم: {{ patient.first_name }} {{ patient.last_name }}<br>
-    الرقم الذاتي: {{ patient.national_id }}<br>
-    الرقم العسكري: {{ patient.military_number }}<br>
+    الاسم: {{ patient.first_name }} {{ patient.last_name }} | الرقم الذاتي: {{ patient.national_id }}<br>
     الحالة الصحية: {{ patient.health_condition }}
 </div>
 
 <div class="report-box">
-    بناءً على التقييم الطبي، وبحضور الأطباء المعتمدين لدى وزارة الدفاع،
-    يتم اتخاذ أحد القرارات التالية بخصوص إصابة الأخ
-    <strong>{{ patient.first_name }} {{ patient.last_name }}</strong>:
-    قبول، رفض، أو تعليق.
+    <strong>الطبيب المسؤول الحالي:</strong> {{ request.user.get_full_name|default:request.user.username }}<br>
+    <em>سيتم إرفاق قرار اللجنة الطبية باسم حسابكم بشكل تلقائي عند الحفظ لمنع التلاعب.</em>
 </div>
 
 <form method="post">
     {% csrf_token %}
-
     <div class="form-grid">
         {% for field in form %}
-            <div class="form-group">
-                <label>{{ field.label }}</label>
-                {{ field }}
-                {% if field.errors %}
-                    <small style="color:red;">{{ field.errors }}</small>
-                {% endif %}
-            </div>
+            {% if field.name == 'decision_reason' %}
+                <div class="form-group conditional-field is-hidden" data-rejection-reason>
+                    <label>{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}<small style="color:red;">{{ field.errors }}</small>{% endif %}
+                </div>
+            {% elif field.name == 'committee_doctors' %}
+                <div class="form-group">
+                    <label>{{ field.label }}</label>
+                    <div class="field-actions">
+                        <button type="button" class="btn btn-small" data-select-all-doctors>تحديد الكل</button>
+                        <button type="button" class="btn btn-small btn-warning" data-clear-doctors>إلغاء التحديد</button>
+                    </div>
+                    <div class="doctor-choice-list" data-doctor-list>
+                        {% for doctor_option in field %}
+                            <label class="doctor-choice">
+                                {{ doctor_option.tag }}
+                                <span class="doctor-select-button">اختيار</span>
+                                <span class="doctor-choice-name">{{ doctor_option.choice_label }}</span>
+                            </label>
+                        {% empty %}
+                            <div class="report-box">
+                                لا توجد أسماء أطباء مضافة حالياً. تتم إضافة الأطباء من لوحة التحكم الإدارية.
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {% if field.errors %}<small style="color:red;">{{ field.errors }}</small>{% endif %}
+                </div>
+            {% else %}
+                <div class="form-group">
+                    <label>{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}<small style="color:red;">{{ field.errors }}</small>{% endif %}
+                </div>
+            {% endif %}
         {% endfor %}
     </div>
-
-    <button type="submit" class="btn">حفظ قرار اللجنة الطبية</button>
+    <button type="submit" class="btn">اعتماد قرار اللجنة الطبية</button>
 </form>
+
+<script>
+    (function () {
+        const decisionField = document.getElementById('id_decision');
+        const reasonField = document.getElementById('id_decision_reason');
+        const reasonGroup = document.querySelector('[data-rejection-reason]');
+        const doctorInputs = document.querySelectorAll('input[name="committee_doctors"]');
+        const selectAllDoctorsButton = document.querySelector('[data-select-all-doctors]');
+        const clearDoctorsButton = document.querySelector('[data-clear-doctors]');
+
+        function syncDoctorButtons() {
+            doctorInputs.forEach(function (input) {
+                const button = input.parentElement.querySelector('.doctor-select-button');
+
+                if (button) {
+                    button.textContent = input.checked ? 'مختار' : 'اختيار';
+                }
+            });
+        }
+
+        function syncReasonRequirement() {
+            if (!decisionField || !reasonField || !reasonGroup) {
+                return;
+            }
+
+            const isRejected = decisionField.value === 'REJECTED';
+            reasonField.required = isRejected;
+            reasonGroup.classList.toggle('is-hidden', !isRejected);
+
+            if (!isRejected) {
+                reasonField.value = '';
+            }
+        }
+
+        if (decisionField) {
+            decisionField.addEventListener('change', syncReasonRequirement);
+            syncReasonRequirement();
+        }
+
+        if (selectAllDoctorsButton) {
+            selectAllDoctorsButton.addEventListener('click', function () {
+                doctorInputs.forEach(function (input) {
+                    input.checked = true;
+                });
+                syncDoctorButtons();
+            });
+        }
+
+        if (clearDoctorsButton) {
+            clearDoctorsButton.addEventListener('click', function () {
+                doctorInputs.forEach(function (input) {
+                    input.checked = false;
+                });
+                syncDoctorButtons();
+            });
+        }
+
+        doctorInputs.forEach(function (input) {
+            input.addEventListener('change', syncDoctorButtons);
+        });
+        syncDoctorButtons();
+    }());
+</script>
 {% endblock %}

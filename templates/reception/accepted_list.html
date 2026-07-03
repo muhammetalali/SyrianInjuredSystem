@@ -28,6 +28,12 @@
                         تعبئة الاستمارة
                     </a>
                 {% endif %}
+                
+                {% if patient.status == 'ACCEPTED' or patient.status == 'QUESTIONNAIRE_COMPLETED' %}
+                    <a class="btn btn-warning" style="background-color: #062f28; color: white; margin-right: 5px;" href="{% url 'reception:patient_print_report' patient.id %}" target="_blank">
+                        طباعة البيانات
+                    </a>
+                {% endif %}
             </td>
         </tr>
         {% empty %}
