@@ -6,11 +6,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-uj&1ivkma-3sidqxg_%w6r((p@q&loo6wpoj*dv(o)u5b4qtak'
 
 # تفعيل وضع التطوير المحلي
-DEBUG = DEBUG = os.environ.get("DEBUG", "False") == "True"
-
-ALLOWED_HOSTS = ALLOWED_HOSTS = os.environ.get(
+DEBUG = os.environ.get("DEBUG", "False") == "True"
+ALLOWED_HOSTS = os.environ.get(
     "ALLOWED_HOSTS",
-    "127.0.0.1,localhost"
+    "127.0.0.1,localhost,.up.railway.app"
 ).split(",")
 
 INSTALLED_APPS = [
