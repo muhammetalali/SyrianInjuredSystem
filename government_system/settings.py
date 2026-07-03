@@ -3,17 +3,17 @@ from pathlib import Path
 import dj_database_url
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-uj&1ivkma-3sidqxg_%w6r((p@q&loo6wpoj*dv(o)u5b4qtak'
+SECRET_KEY = os.environ["SECRET_KEY"]
 
 # تفعيل وضع التطوير المحلي
 DEBUG = os.environ.get("DEBUG", "False") == "True"
-ALLOWED_HOSTS = os.environ.get(
-    "ALLOWED_HOSTS",
-    "127.0.0.1,localhost,.up.railway.app"
+CSRF_TRUSTED_ORIGINS = os.environ.get(
+    "CSRF_TRUSTED_ORIGINS",
+    "https://*.up.railway.app"
 ).split(",")
 
 INSTALLED_APPS = [
-    'django_extensions',
+    #'django_extensions',
     'reception.apps.ReceptionConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -67,7 +67,6 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
-
 LANGUAGE_CODE = "ar"
 TIME_ZONE = "Asia/Damascus"
 USE_I18N = True
